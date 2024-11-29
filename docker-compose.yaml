@@ -1,0 +1,32 @@
+services:
+  db-compose:
+    image: postgres:14
+    restart: always
+    # set shared memory limit when using docker-compose
+    shm_size: 128mb # Recommended in dockerhub
+    expose:
+      - 5432 # This DOES NOT expose the port to host machine
+    environment:
+      POSTGRES_PASSWORD: testpass
+      POSTGRES_USER: testuser
+      POSTGRES_DB: datahack
+    volumes:
+      - db_data_compose:/var/lib/postgresql/data
+  
+  api-compose:
+    image: sergioym/api-docker:2.0.0
+    restart: always
+    depends_on:
+      - db-compose
+    ports:
+      - 8081:5000 # This DOES expose the port to host machine
+    environment:
+      DB_USER: testuser
+      DB_PASSWORD: testpass
+      DB_HOST: db-compose
+      DB_PORT: 5432
+      DB_NAME: datahack
+      VERSION: 2.1.0-SYM
+
+volumes:
+  db_data_compose:
