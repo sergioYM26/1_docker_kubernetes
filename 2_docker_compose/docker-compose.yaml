@@ -14,7 +14,11 @@ services:
       - db_data_compose:/var/lib/postgresql/data
   
   api-compose:
+    # Comment next line and uncomment following to build image
     image: sergioym/api-docker:2.0.0
+    # build:
+    #   context: ../1_docker
+    #   dockerfile: Dockerfile
     restart: always
     depends_on:
       - db-compose
@@ -26,7 +30,7 @@ services:
       DB_HOST: db-compose
       DB_PORT: 5432
       DB_NAME: datahack
-      VERSION: 2.1.0-SYM
+      VERSION: 0.0.0-SYM
 
 volumes:
   db_data_compose:

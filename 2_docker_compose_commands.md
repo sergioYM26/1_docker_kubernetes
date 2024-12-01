@@ -2,9 +2,21 @@
 
 Este ejercicio pretende levantar la aplicación python y una base de datos postgres con docker compose.
 
+## Elementos
+En esta ocasión vamos a levantar los mismos elementos descritos en el apartado anterior (con docker únicamente), pero aprovechando la simplificación que nos ofrece docker compose. Tenemos que definir:
+
+- Un servicio para la bbdd, con volumen asociado.
+- Un servicio para la aplicación python.
+- Un volumen mencionado previamente.
+
+Docker compose crea automáticamente una red (network) por defecto para facilitar la comunicación entre contenedores.
+
+## Levantar el servicio
+
 Para levantar el servicio:
 
 ```bash
+$ cd 2_docker_compose/
 $ docker compose up -d 
 ```
 
@@ -48,7 +60,7 @@ Comprobar versión:
 ```bash
 $ curl http://localhost:8081/version
 
-{"version":"2.0.0-SYM"}
+{"version":"0.0.0-SYM"}
 ```
 
 ## Reinicio del sistema y comprobar persistencia

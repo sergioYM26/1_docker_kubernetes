@@ -20,6 +20,7 @@ $ docker volume create db-data-docker
 Falta construir la imagen de nuestra aplicación python:
 
 ```bash
+$ cd 1_docker/
 $ docker build -t api-docker:1.0.0 .
 ```
 

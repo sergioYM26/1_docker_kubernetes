@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: python
+  namespace: datahack-ns
+spec:
+  selector:
+    matchLabels:
+      app: python
+  template:
+    metadata:
+      namespace: datahack-ns
+      labels:
+        app: python
+    spec:
+      containers:
+      - name: python
+        image: sergioym/api-docker:2.0.0
+        resources: {}
+        ports:
+        - containerPort: 5000
+        envFrom:
+        - configMapRef:
+            name: python-config
+        env:
+        - name: DB_USER
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_USER
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: postgres-secret
+              key: POSTGRES_PASSWORD
+        - name: DB_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: postgres-config
+              key: POSTGRES_DB
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: api-service
+  namespace: datahack-ns
+spec:
+  selector:
+    app: python
+  ports:
+  - port: 5000
+    targetPort: 5000
+
