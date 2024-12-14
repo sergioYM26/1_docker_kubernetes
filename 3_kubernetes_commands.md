@@ -14,12 +14,23 @@ Se ha decicido levantar los siguientes elementos en el cluster:
 ## Levantar el servicio
 Para levantar el servicio:
 
+Debemos construir la imagen de docker que va a usar kubernetes `api-kubernetes:1.0.0`:
 ```bash
+$ eval $(minikube docker-env)
 $ cd 3_kubernetes/
+$ docker build -t api-kubernetes:1.0.0 ../1_docker/.
+```
+
+Si no funciona por alguna razón, probar a usar la imagen de dockerhub que tengo `sergioym/api-docker:2.0.0` (Es pública)
+
+```bash
+$ cd 3_kubernetes/ # Si no estás ya en el directorio
 $ kubectl apply -f namespace-config-secret.yaml # Crea namespace, configMaps y secretos necesarios
 $ kubectl apply -f postgresql.yaml # Crea la bbdd postgres (statefulset para persistencia)
 $ kubectl apply -f pythonapp.yaml # Crea la aplicación python (deployment)
 ```
+
+Podemos evitar condiciones de carrera con un initContainer en la API, pero no se han implementado.
 
 Con el servicio levantado, para poder realizar las pruebas, debemos hacer un `port-forward` del servicio de la API. 
 
@@ -72,16 +83,16 @@ $ curl http://localhost:8082/version
 
 ## Reinicio del sistema y comprobar persistencia
 
-Tiramos el servicio:
+Tiramos el servicio de la bbdd:
 ```bash
-$ kubectl -n datahack-ns delete statefulset postgresql
+$ kubectl -n datahack-ns scale statefulset postgresql --replicas=0
 $ kubectl -n datahack-ns delete deployment python
 ```
 
-Levantamos el servicio de nuevo cambiando la versión de la aplicación. Si se quiere probar a cambiar la versión, cambiar el fichero docker compose, la variable VERSION del servicio `api-compose` Importante! Cambiamos la versión, pero sigue siendo la misma imagen, ya que se lee del entorno:
+Levantamos el servicio de nuevo cambiando la versión de la aplicación. Si se quiere probar a cambiar la versión, cambiar el fichero `namespace-config-secret.yaml`, la variable VERSION del `ConfigMap` -> `python-config` Importante! Cambiamos la versión, pero sigue siendo la misma imagen, ya que se lee del entorno:
 ```bash
 $ kubectl apply -f namespace-config-secret.yaml # Actualizar configmap
-$ kubectl apply -f postgresql.yaml # Volver a crear la bbdd postgres
+$ kubectl -n datahack-ns scale statefulset postgresql --replicas=1 # Volver a crear la bbdd postgres
 $ kubectl apply -f pythonapp.yaml # Volver a crear la aplicación python
 ```
 
@@ -121,3 +132,15 @@ $ kubectl -n datahack-ns scale deployment --replicas=3 python
 ```
 
 Si lo comprobamos en el dashboard, vemos como todas las réplicas han conectado y están listas para recibir peticiones.
+
+También:
+```bash
+$ kubectl -n datahack-ns get pods
+```
+
+## Limpieza
+```bash
+$ kubectl delete -f namespace-config-secret.yaml
+$ kubectl delete -f postgresql.yaml
+$ kubectl delete -f pythonapp.yaml
+```

@@ -10,18 +10,24 @@ services:
       POSTGRES_PASSWORD: testpass
       POSTGRES_USER: testuser
       POSTGRES_DB: datahack
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready", "-d", "datahack"]
+      interval: 10s
+      timeout: 5s
+      retries: 5 
     volumes:
       - db_data_compose:/var/lib/postgresql/data
   
   api-compose:
-    # Comment next line and uncomment following to build image
-    image: sergioym/api-docker:2.0.0
-    # build:
-    #   context: ../1_docker
-    #   dockerfile: Dockerfile
+    build:
+      context: ../1_docker
+      dockerfile: Dockerfile
+    # Uncomment next line to test image pull from dockerhub (it is public) and comment build section
+    # image: sergioym/api-docker:2.0.0
     restart: always
     depends_on:
-      - db-compose
+      db-compose:
+        condition: service_healthy
     ports:
       - 8081:5000 # This DOES expose the port to host machine
     environment:

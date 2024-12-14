@@ -15,7 +15,10 @@ spec:
     spec:
       containers:
       - name: python
-        image: sergioym/api-docker:2.0.0
+        image: api-kubernetes:1.0.0
+        imagePullPolicy: IfNotPresent
+        # If local image does not work, use following:
+        # image: sergioym/api-docker:2.0.0
         resources: {}
         ports:
         - containerPort: 5000
@@ -50,4 +53,3 @@ spec:
   ports:
   - port: 5000
     targetPort: 5000
-

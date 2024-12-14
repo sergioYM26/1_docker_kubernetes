@@ -32,7 +32,6 @@ Con esto, ya podemos levantar la aplicación, para ello, necesitamos primero una
 $ docker run -d --rm --name db-docker \
       --network datahack-docker \
       -v db-data-docker:/var/lib/postgresql/data \
-      -p 5432:5432 \
       -e POSTGRES_PASSWORD=testpass \
       -e POSTGRES_USER=testuser \
       -e POSTGRES_DB=datahack \
@@ -109,8 +108,7 @@ Levantamos el servicio de nuevo cambiando la versión de la aplicación. Importa
 ```bash
 $ docker run -d --rm --name db-docker \
       --network datahack-docker \
-      -v db-data:/var/lib/postgresql/data \
-      -p 5432:5432 \
+      -v db-data-docker:/var/lib/postgresql/data \
       -e POSTGRES_PASSWORD=testpass \
       -e POSTGRES_USER=testuser \
       -e POSTGRES_DB=datahack \
@@ -121,7 +119,7 @@ $ docker run -d --rm --name api-docker \
       -p 8080:5000 \
       -e DB_USER=testuser \
       -e DB_PASSWORD=testpass \
-      -e DB_HOST=db \
+      -e DB_HOST=db-docker \
       -e DB_PORT=5432 \
       -e DB_NAME=datahack \
       -e VERSION=1.0.0-SYM \
@@ -157,4 +155,14 @@ Para ello, debemos iniciar sesión en dockerhub, tagear la imagen y subirla
 $ docker login
 $ docker tag api-docker:1.0.0 sergioym/api-docker:2.0.0
 $ docker push sergioym/api-docker:2.0.0
+```
+
+## Limpieza
+También se puede hacer con comandos prune, pero me da miedo borrar las imágenes/containers de kubernetes (por usar el driver de docker).
+
+```bash
+$ docker stop api-docker
+$ docker stop db-docker
+$ docker network rm datahack-docker
+$ docker volume rm db-data-docker
 ```

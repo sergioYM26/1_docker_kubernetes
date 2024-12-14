@@ -17,7 +17,7 @@ Para levantar el servicio:
 
 ```bash
 $ cd 2_docker_compose/
-$ docker compose up -d 
+$ docker compose up -d
 ```
 
 Con el servicio levantado, podemos realizar las mismas pruebas:
